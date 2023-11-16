@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_alcore/src/app/widgets/app_history/app_history.dart';
 import 'package:flutter_alcore/src/app/widgets/color_loader.dart';
 import 'package:flutter_alcore/src/app/widgets/custom_currency_input_formatter.dart';
 import 'package:flutter_alcore/src/app/widgets/custom_light_theme_widget.dart';
@@ -12,11 +13,13 @@ import 'package:flutter_alcore/src/app/widgets/custom_padding.dart';
 import 'package:flutter_alcore/src/app/widgets/rounded_elevated_button.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:logger/logger.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 Widget spaceH([double h = 10]) {
   return SizedBox(height: h);
@@ -167,6 +170,61 @@ void showSnackBar(BuildContext context, String info) {
 
 void showComingSoonInfo(BuildContext context, String feature) {
   showSnackBar(context, "$feature coming soon...");
+}
+
+void showAboutInfo(BuildContext context, String logoAssetPath) async {
+  final packageInfo = await PackageInfo.fromPlatform();
+  WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    showCustomAboutDialog(
+        context: context,
+        applicationIcon:
+            SizedBox(width: 60, height: 60, child: Image.asset(logoAssetPath)),
+        applicationName: packageInfo.appName,
+        applicationVersion: packageInfo.version,
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                Get.to(() => const AppHistoryPage());
+              },
+              child: const Text("Riwayat Aplikasi"))
+        ]);
+  });
+}
+
+void showCustomAboutDialog({
+  required BuildContext context,
+  String? applicationName,
+  String? applicationVersion,
+  Widget? applicationIcon,
+  String? applicationLegalese,
+  List<Widget>? children,
+  bool useRootNavigator = true,
+  RouteSettings? routeSettings,
+  Offset? anchorPoint,
+}) {
+  showDialog<void>(
+    context: context,
+    useRootNavigator: useRootNavigator,
+    builder: (BuildContext context) {
+      final ThemeData theme = Theme.of(context);
+      return Theme(
+        data: theme.copyWith(
+            textTheme: theme.textTheme.copyWith(
+          headlineSmall: theme.textTheme.headlineSmall?.copyWith(fontSize: 18),
+          bodyMedium: const TextStyle(color: Colors.black),
+        )),
+        child: AboutDialog(
+          applicationName: applicationName,
+          applicationVersion: applicationVersion,
+          applicationIcon: applicationIcon,
+          applicationLegalese: applicationLegalese,
+          children: children,
+        ),
+      );
+    },
+    routeSettings: routeSettings,
+    anchorPoint: anchorPoint,
+  );
 }
 
 String convertDate(String? value,

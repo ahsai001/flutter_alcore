@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-/// modified : 10 agustus 2023
+/// modified : 15 september 2023
 class CustomCurrencyInputFormatter extends TextInputFormatter {
   final String symbol;
   final int decimalDigits;
@@ -53,10 +53,12 @@ class CustomCurrencyInputFormatter extends TextInputFormatter {
             selection: TextSelection.collapsed(
                 offset: oldValue.text.indexOf(decimalChar!) + 1));
       }
-      if (oldValue.selection.baseOffset == oldValue.text.length &&
-          (newValue.selection.baseOffset == oldValue.text.length + 1)) {
-        //handle ketika cursor di akhir text kemudian ditambah huruf
-        return oldValue;
+      if (oldValue.text.isNotEmpty && decimalDigits > 0) {
+        if (oldValue.selection.baseOffset == oldValue.text.length &&
+            (newValue.selection.baseOffset == oldValue.text.length + 1)) {
+          //handle ketika cursor di akhir text decimal kemudian ditambah angka
+          return oldValue;
+        }
       }
 
       if (_countString(newValue.text, groupChar!) <

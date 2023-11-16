@@ -1,21 +1,29 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_alcore/src/app/widgets/color_loader.dart';
 import 'package:flutter_alcore/src/app/widgets/scan/scanner_error_widget.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+/// updated 12 agustus 2023
 class ScannerPage extends StatefulWidget {
   final String? title;
-  final void Function(BuildContext context, String code, Barcode barcode,
-      BarcodeCapture? argument)? onSuccessCallback;
+  final Future<void> Function(BuildContext context, String code,
+      Barcode barcode, BarcodeCapture? argument)? onSuccessCallback;
   final void Function(BuildContext context)? onFailedCallback;
   final MobileScannerController controller;
+  final bool manualScan;
+  final String? messageWhenProcessingResult;
+  final Widget? loadingWidgetWhenProcessingResult;
   const ScannerPage(
       {Key? key,
       this.title,
       this.onSuccessCallback,
       this.onFailedCallback,
-      required this.controller})
+      required this.controller,
+      this.manualScan = false,
+      this.messageWhenProcessingResult,
+      this.loadingWidgetWhenProcessingResult})
       : super(key: key);
 
   @override
@@ -27,8 +35,13 @@ class _ScannerPageState extends State<ScannerPage> {
   BarcodeCapture? capture;
   //double _progress = 0.0;
   late Animation<double> animation;
+  bool manualScanActive = false;
+  bool isProcessingResult = false;
 
   Future<void> onDetect(BarcodeCapture barcode) async {
+    if (widget.manualScan && manualScanActive == false) {
+      return;
+    }
     capture = barcode;
     setState(() => this.barcode = barcode.barcodes.first);
     if (barcode.barcodes.first.rawValue == null) {
@@ -39,10 +52,18 @@ class _ScannerPageState extends State<ScannerPage> {
       debugPrint('Barcode found! $code');
       widget.controller.stop();
       if (widget.onSuccessCallback != null) {
-        widget.onSuccessCallback!(
-            context, code, barcode.barcodes.first, barcode);
         setState(() {
           this.barcode = null;
+          if (widget.manualScan) {
+            manualScanActive = false;
+          }
+          isProcessingResult = true;
+        });
+
+        await widget.onSuccessCallback!(
+            context, code, barcode.barcodes.first, barcode);
+        setState(() {
+          isProcessingResult = false;
         });
       } else {
         Navigator.of(context).pop(code);
@@ -55,7 +76,6 @@ class _ScannerPageState extends State<ScannerPage> {
   @override
   void initState() {
     super.initState();
-    widget.controller.start();
   }
 
   @override
@@ -72,31 +92,37 @@ class _ScannerPageState extends State<ScannerPage> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              MobileScanner(
-                fit: BoxFit.contain,
-                scanWindow: scanWindow,
-                controller: widget.controller,
-                onScannerStarted: (arguments) {
-                  setState(() {
-                    //debugPrint("ahmad : scanner started");
-                    this.arguments = arguments;
-                  });
-                },
-                errorBuilder: (context, exception, widget) {
-                  return ScannerErrorWidget(error: exception);
-                },
-                placeholderBuilder: ((context, widget) {
-                  return Container(
-                    color: Colors.transparent,
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/app_icon.png",
-                      width: scanWindow.width,
-                      height: scanWindow.height,
-                    ),
-                  );
-                }),
-                onDetect: onDetect,
+              RotatedBox(
+                quarterTurns:
+                    MediaQuery.of(context).orientation == Orientation.portrait
+                        ? 0
+                        : 3,
+                child: MobileScanner(
+                  fit: BoxFit.contain,
+                  scanWindow: scanWindow,
+                  controller: widget.controller,
+                  onScannerStarted: (arguments) {
+                    setState(() {
+                      //debugPrint("ahmad : scanner started");
+                      this.arguments = arguments;
+                    });
+                  },
+                  errorBuilder: (context, exception, widget) {
+                    return ScannerErrorWidget(error: exception);
+                  },
+                  placeholderBuilder: ((context, widget) {
+                    return Container(
+                      color: Colors.transparent,
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        "assets/images/app_icon.png",
+                        width: scanWindow.width,
+                        height: scanWindow.height,
+                      ),
+                    );
+                  }),
+                  onDetect: onDetect,
+                ),
               ),
               if (barcode != null &&
                   barcode?.corners != null &&
@@ -109,10 +135,16 @@ class _ScannerPageState extends State<ScannerPage> {
                     capture: capture!,
                   ),
                 ),
-              MovingLine(scanWindow),
+              if (widget.manualScan && manualScanActive) MovingLine(scanWindow),
+              if (!widget.manualScan) MovingLine(scanWindow),
               CustomPaint(
                 painter: ScannerOverlay(scanWindow),
               ),
+              if (isProcessingResult)
+                Center(
+                  child: (widget.loadingWidgetWhenProcessingResult ??
+                      const ColorLoader()),
+                ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
@@ -123,14 +155,43 @@ class _ScannerPageState extends State<ScannerPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Center(
-                        child: Text(
-                          widget.title ?? "Scan QR Code",
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(color: Colors.white, fontSize: 18),
-                        ),
+                        child: !widget.manualScan
+                            ? Text(
+                                widget.title ?? "Scan QR Code",
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
+                                        color: Colors.white, fontSize: 18),
+                              )
+                            : ElevatedButton.icon(
+                                onPressed: isProcessingResult
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          if (manualScanActive) {
+                                            manualScanActive = false;
+                                          } else {
+                                            manualScanActive = true;
+                                          }
+                                        });
+                                      },
+                                icon: manualScanActive
+                                    ? const Icon(Icons.stop)
+                                    : const Icon(Icons.play_arrow),
+                                label: Text(
+                                  isProcessingResult
+                                      ? (widget.messageWhenProcessingResult ??
+                                          "Processing...")
+                                      : (widget.title ?? "Scan QR Code"),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .copyWith(
+                                          color: Colors.white, fontSize: 18),
+                                )),
                       ),
                     ],
                   ),

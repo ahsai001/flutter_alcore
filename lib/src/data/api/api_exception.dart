@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:get/get_connect/http/src/response/response.dart'
+    as get_response;
+import 'package:get/get_connect/http/src/status/http_status.dart';
 
 class ApiExceptions implements Exception {
   late String message;
@@ -57,4 +60,44 @@ class ApiExceptions implements Exception {
 
   @override
   String toString() => message;
+
+  int? statusCode;
+
+  late HttpStatus status;
+
+  ApiExceptions.fromGetXError(get_response.Response response) {
+    if (response.status.hasError) {
+      message = response.statusText!;
+      status = response.status;
+      statusCode = response.statusCode;
+
+      switch (response.status.code) {
+        case null:
+          if (response.statusText!.contains("SocketException")) {
+            message = 'No Internet';
+            break;
+          }
+          message = "Unexpected error occurred";
+          break;
+        case HttpStatus.clientClosedRequest:
+          message = "Request to API server was cancelled";
+          break;
+        case HttpStatus.networkConnectTimeoutError:
+          message = "Connection timeout with API server";
+          break;
+        case HttpStatus.connectionClosedWithoutResponse:
+          message = "Receive timeout in connection with API server";
+          break;
+        case HttpStatus.requestTimeout:
+          message = "Send timeout in connection with API server";
+          break;
+        default:
+          message = _handleError(
+            statusCode,
+            "",
+          );
+          break;
+      }
+    }
+  }
 }
