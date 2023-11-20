@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_alcore/src/app/widgets/custom_light_theme_widget.dart';
-import 'package:flutter_alcore/src/app/widgets/menu_info.dart';
-import 'package:flutter_alcore/src/utils/widget_util.dart';
+import 'package:syshab_mobile/src/app/widgets/custom_light_theme_widget.dart';
+import 'package:syshab_mobile/src/app/widgets/menu_info.dart';
+import 'package:syshab_mobile/src/utils/widget_util.dart';
 
 Widget getMenuPage(BuildContext context, MenuInfo parentMenu) {
   return GridMenuPage(
@@ -68,9 +68,9 @@ class GridItemWidget extends StatelessWidget {
   final String? imagePath;
   final String? title;
   final void Function(BuildContext context)? onTap;
-  final int? count;
+  final Widget Function(BuildContext context)? badgeBuilder;
   const GridItemWidget(
-      {Key? key, this.imagePath, this.title, this.onTap, this.count = 0})
+      {Key? key, this.imagePath, this.title, this.onTap, this.badgeBuilder})
       : super(key: key);
 
   @override
@@ -96,7 +96,7 @@ class GridItemWidget extends StatelessWidget {
                       width: 80,
                       height: 80,
                     ),
-                  if (imagePath != null) const SpaceHeight(),
+                  if (imagePath != null) spaceH(4),
                   if (title != null)
                     Text(
                       title!,
@@ -109,20 +109,8 @@ class GridItemWidget extends StatelessWidget {
                     )
                 ],
               ),
-              if (count != null && count! > 0)
-                Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(5),
-                        decoration: const BoxDecoration(
-                            color: Colors.red,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(1000))),
-                        child: Text(count.toString()))),
+              if (badgeBuilder != null)
+                Positioned(left: 0, top: 0, child: badgeBuilder!.call(context)),
             ],
           ),
         ),

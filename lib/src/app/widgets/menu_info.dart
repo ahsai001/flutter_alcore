@@ -1,38 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_alcore/src/app/widgets/grid_menu_page.dart';
-
-class Lvlmenu {
-  String? namaMenu;
-  String? cookedNamaMenu;
-  int? stts;
-  String? levelName;
-
-  Lvlmenu({
-    this.namaMenu,
-    this.cookedNamaMenu,
-    this.stts,
-    this.levelName,
-  }) {
-    cookedNamaMenu ??= namaMenu?.cook();
-  }
-
-  factory Lvlmenu.fromJson(Map<String, dynamic>? json) {
-    if (json == null) return Lvlmenu();
-    return Lvlmenu(
-      namaMenu: json["nama_menu"],
-      cookedNamaMenu: (json["nama_menu"] as String?)?.cook(),
-      stts: json["stts"],
-      levelName: json["level_name"],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        "nama_menu": namaMenu,
-        "stts": stts,
-        "level_name": levelName,
-      };
-}
+import 'package:syshab_mobile/src/app/widgets/grid_menu_page.dart';
+import 'package:syshab_mobile/src/domain/models/login/login_response.dart';
+import 'package:syshab_mobile/src/utils/widget_util.dart';
 
 class MenuInfo {
   String? title;
@@ -42,15 +12,17 @@ class MenuInfo {
   bool? active;
   void Function(BuildContext context)? onTap;
   List<MenuInfo>? children;
-  MenuInfo(
-    this.title, {
-    this.name,
-    this.cookedName,
-    this.imagePath,
-    this.active,
-    this.onTap,
-    this.children,
-  }) {
+  Widget Function(BuildContext context)? badgeBuilder;
+  void Function()? didPopBack;
+  MenuInfo(this.title,
+      {this.name,
+      this.cookedName,
+      this.imagePath,
+      this.active,
+      this.onTap,
+      this.children,
+      this.badgeBuilder,
+      this.didPopBack}) {
     name ??= title;
     cookedName ??= name?.cook();
     active ??= false;
@@ -62,16 +34,17 @@ class MenuInfo {
 
   GridItemWidget asGridItemWidget() {
     return GridItemWidget(
-        title: title,
-        imagePath: imagePath,
-        onTap: (onTap == null && children != null && children!.isNotEmpty)
-            ? (context) {
-                Navigator.of(context, rootNavigator: true)
-                    .push(MaterialPageRoute(builder: (context) {
-                  return getMenuPage(context, this);
-                }));
-              }
-            : onTap);
+      title: title,
+      imagePath: imagePath,
+      onTap: (onTap == null && children != null && children!.isNotEmpty)
+          ? (context) {
+              pushNewPage2(context, (context) => getMenuPage(context, this),
+                      rootNavigator: true)
+                  .then((value) => didPopBack?.call());
+            }
+          : onTap,
+      badgeBuilder: badgeBuilder,
+    );
   }
 }
 
