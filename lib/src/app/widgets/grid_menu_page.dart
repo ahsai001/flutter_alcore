@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:syshab_mobile/src/app/widgets/custom_light_theme_widget.dart';
-import 'package:syshab_mobile/src/app/widgets/menu_info.dart';
-import 'package:syshab_mobile/src/utils/widget_util.dart';
+import 'package:flutter_alcore/src/app/widgets/custom_light_theme_widget.dart';
+import 'package:flutter_alcore/src/app/widgets/menu_info.dart';
+import 'package:flutter_alcore/src/utils/widget_util.dart';
 
 Widget getMenuPage(BuildContext context, MenuInfo parentMenu) {
   return GridMenuPage(

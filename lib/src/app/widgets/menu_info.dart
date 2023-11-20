@@ -1,8 +1,39 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:syshab_mobile/src/app/widgets/grid_menu_page.dart';
-import 'package:syshab_mobile/src/domain/models/login/login_response.dart';
-import 'package:syshab_mobile/src/utils/widget_util.dart';
+import 'package:flutter_alcore/src/app/widgets/grid_menu_page.dart';
+import 'package:flutter_alcore/src/utils/widget_util.dart';
+
+class Lvlmenu {
+  String? namaMenu;
+  String? cookedNamaMenu;
+  int? stts;
+  String? levelName;
+
+  Lvlmenu({
+    this.namaMenu,
+    this.cookedNamaMenu,
+    this.stts,
+    this.levelName,
+  }) {
+    cookedNamaMenu ??= namaMenu?.cook();
+  }
+
+  factory Lvlmenu.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return Lvlmenu();
+    return Lvlmenu(
+      namaMenu: json["nama_menu"],
+      cookedNamaMenu: (json["nama_menu"] as String?)?.cook(),
+      stts: json["stts"],
+      levelName: json["level_name"],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        "nama_menu": namaMenu,
+        "stts": stts,
+        "level_name": levelName,
+      };
+}
 
 class MenuInfo {
   String? title;
@@ -38,7 +69,8 @@ class MenuInfo {
       imagePath: imagePath,
       onTap: (onTap == null && children != null && children!.isNotEmpty)
           ? (context) {
-              pushNewPage2(context, (context) => getMenuPage(context, this),
+              pushNewPageWithTransition(
+                      context, (context) => getMenuPage(context, this),
                       rootNavigator: true)
                   .then((value) => didPopBack?.call());
             }
