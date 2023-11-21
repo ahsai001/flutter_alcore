@@ -227,7 +227,33 @@ void showCustomAboutDialog({
   );
 }
 
-String convertDate(String? value,
+DateTime? getDateTime(String? value,
+    {String? fromFormat, bool isFromUtc = false, String? timeZone}) {
+  if (value == null) return null;
+  if (value.isEmpty) return null;
+
+  var parsedDate = (fromFormat != null
+      ? DateFormat(fromFormat).parse(value, isFromUtc)
+      : DateTime.parse(value));
+
+  Duration? offset;
+
+  if (timeZone != null && timeZone.isNotEmpty) {
+    offset = getOffsetFromTimeZone(timeZone);
+  }
+
+  if (isFromUtc) {
+    if (offset != null) {
+      parsedDate = parsedDate.add(offset);
+    } else {
+      parsedDate = parsedDate.toLocal();
+    }
+  }
+
+  return parsedDate;
+}
+
+String convertDateTime(String? value,
     {String? fromFormat,
     String? toFormat,
     bool isFromUtc = false,
