@@ -228,9 +228,18 @@ void showCustomAboutDialog({
 }
 
 DateTime? getDateTime(String? value,
-    {String? fromFormat, bool isFromUtc = false, String? timeZone}) {
+    {String? fromFormat,
+    bool isFromUtc = false,
+    bool isToUtc = false,
+    String? timeZone}) {
   if (value == null) return null;
   if (value.isEmpty) return null;
+
+  if (isFromUtc) {
+    if (!value.endsWith("Z")) {
+      value = "${value}Z";
+    }
+  }
 
   var parsedDate = (fromFormat != null
       ? DateFormat(fromFormat).parse(value, isFromUtc)
@@ -242,11 +251,19 @@ DateTime? getDateTime(String? value,
     offset = getOffsetFromTimeZone(timeZone);
   }
 
-  if (isFromUtc) {
+  if (isFromUtc && !isToUtc) {
     if (offset != null) {
       parsedDate = parsedDate.add(offset);
     } else {
       parsedDate = parsedDate.toLocal();
+    }
+  }
+
+  if (!isFromUtc && isToUtc) {
+    if (offset != null) {
+      parsedDate = parsedDate.add(offset);
+    } else {
+      parsedDate = parsedDate.toUtc();
     }
   }
 
