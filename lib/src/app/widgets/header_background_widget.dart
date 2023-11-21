@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_alcore/src/app/widgets/custom_extension.dart';
+import 'package:flutter_alcore/src/extensions/color_manipulation.dart';
 
 class HeaderBackgroundWidget extends StatelessWidget {
   final Widget? child;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_alcore/src/app/widgets/custom_extension.dart';
 import 'package:flutter_alcore/src/app/widgets/empty_widget.dart';
 import 'package:flutter_alcore/src/app/widgets/error_widget.dart';
 import 'package:flutter_alcore/src/app/widgets/loading_widget.dart';
+import 'package:flutter_alcore/src/extensions/custom_extension.dart';
 import 'package:loading_more_list_library/loading_more_list_library.dart';
 
 class CustomLoadingMoreListIndicatorWidget extends StatelessWidget {

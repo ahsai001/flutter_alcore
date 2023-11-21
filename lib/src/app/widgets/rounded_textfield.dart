@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_alcore/src/app/widgets/custom_extension.dart';
+import 'package:flutter_alcore/src/extensions/custom_extension.dart';
 
 class RoundedTextField extends StatefulWidget {
   final Color? backgroundColor;
