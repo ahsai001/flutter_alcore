@@ -5,7 +5,7 @@ import 'package:flutter_alcore/src/app/widgets/color_loader.dart';
 import 'package:flutter_alcore/src/app/widgets/scan/scanner_error_widget.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// updated 12 agustus 2023
+/// updated 02 december 2023
 class ScannerPage extends StatefulWidget {
   final String? title;
   final Future<void> Function(BuildContext context, String code,
@@ -15,6 +15,7 @@ class ScannerPage extends StatefulWidget {
   final bool manualScan;
   final String? messageWhenProcessingResult;
   final Widget? loadingWidgetWhenProcessingResult;
+  final List<Widget>? customVerticalWidgets;
   const ScannerPage(
       {Key? key,
       this.title,
@@ -23,7 +24,8 @@ class ScannerPage extends StatefulWidget {
       required this.controller,
       this.manualScan = false,
       this.messageWhenProcessingResult,
-      this.loadingWidgetWhenProcessingResult})
+      this.loadingWidgetWhenProcessingResult,
+      this.customVerticalWidgets})
       : super(key: key);
 
   @override
@@ -87,6 +89,10 @@ class _ScannerPageState extends State<ScannerPage> {
     );
     return Scaffold(
       backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        forceMaterialTransparency: true,
+      ),
       body: Builder(
         builder: (context) {
           return Stack(
@@ -147,55 +153,95 @@ class _ScannerPageState extends State<ScannerPage> {
                 ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  alignment: Alignment.bottomCenter,
-                  height: 100,
-                  color: Colors.black.withOpacity(0.4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Center(
-                        child: !widget.manualScan
-                            ? Text(
-                                widget.title ?? "Scan QR Code",
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .copyWith(
-                                        color: Colors.white, fontSize: 18),
-                              )
-                            : ElevatedButton.icon(
-                                onPressed: isProcessingResult
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          if (manualScanActive) {
-                                            manualScanActive = false;
-                                          } else {
-                                            manualScanActive = true;
-                                          }
-                                        });
-                                      },
-                                icon: manualScanActive
-                                    ? const Icon(Icons.stop)
-                                    : const Icon(Icons.play_arrow),
-                                label: Text(
-                                  isProcessingResult
-                                      ? (widget.messageWhenProcessingResult ??
-                                          "Processing...")
-                                      : (widget.title ?? "Scan QR Code"),
+                child: MediaQuery.of(context).orientation ==
+                        Orientation.portrait
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          !widget.manualScan
+                              ? Text(
+                                  widget.title ?? "Scan QR Code",
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyLarge!
                                       .copyWith(
                                           color: Colors.white, fontSize: 18),
-                                )),
+                                )
+                              : ElevatedButton.icon(
+                                  onPressed: isProcessingResult
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            if (manualScanActive) {
+                                              manualScanActive = false;
+                                            } else {
+                                              manualScanActive = true;
+                                            }
+                                          });
+                                        },
+                                  icon: manualScanActive
+                                      ? const Icon(Icons.stop)
+                                      : const Icon(Icons.play_arrow),
+                                  label: Text(
+                                    isProcessingResult
+                                        ? (widget.messageWhenProcessingResult ??
+                                            "Processing...")
+                                        : (widget.title ?? "Scan QR Code"),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                            color: Colors.white, fontSize: 18),
+                                  )),
+                          ...(widget.customVerticalWidgets ?? [])
+                        ],
+                      )
+                    : Row(
+                        //mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          !widget.manualScan
+                              ? Text(
+                                  widget.title ?? "Scan QR Code",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .copyWith(
+                                          color: Colors.white, fontSize: 18),
+                                )
+                              : ElevatedButton.icon(
+                                  onPressed: isProcessingResult
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            if (manualScanActive) {
+                                              manualScanActive = false;
+                                            } else {
+                                              manualScanActive = true;
+                                            }
+                                          });
+                                        },
+                                  icon: manualScanActive
+                                      ? const Icon(Icons.stop)
+                                      : const Icon(Icons.play_arrow),
+                                  label: Text(
+                                    isProcessingResult
+                                        ? (widget.messageWhenProcessingResult ??
+                                            "Processing...")
+                                        : (widget.title ?? "Scan QR Code"),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .copyWith(
+                                            color: Colors.white, fontSize: 18),
+                                  )),
+                          ...(widget.customVerticalWidgets ?? [])
+                        ],
                       ),
-                    ],
-                  ),
-                ),
               ),
             ],
           );
