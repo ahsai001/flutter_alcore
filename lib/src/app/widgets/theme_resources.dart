@@ -93,8 +93,3 @@ var darkTheme = ThemeData(
           // labelMedium: TextStyle(color: puhbaPrimary),
           // labelSmall: TextStyle(color: puhbaPrimary),
         )));
-
-extension TextThemeExtension on TextTheme {
-  TextStyle? get titleLargeWithPrimaryColor =>
-      titleLarge?.apply(color: puhbaPrimary);
-}

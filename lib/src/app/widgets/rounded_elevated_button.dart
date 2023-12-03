@@ -4,6 +4,7 @@ class RoundedElevatedButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? foregroundColor;
   final Color? backgroundColor;
+  final EdgeInsetsGeometry? padding;
   final Widget child;
 
   const RoundedElevatedButton(
@@ -11,13 +12,14 @@ class RoundedElevatedButton extends StatelessWidget {
       this.onPressed,
       required this.child,
       this.foregroundColor,
-      this.backgroundColor});
+      this.backgroundColor,
+      this.padding});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
         style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.zero,
+            padding: padding,
             foregroundColor: foregroundColor,
             backgroundColor: backgroundColor,
             shape: const RoundedRectangleBorder(
