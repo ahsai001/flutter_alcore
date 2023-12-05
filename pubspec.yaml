@@ -85,7 +85,7 @@ flutter:
   # For details regarding fonts in packages, see
   # https://flutter.dev/custom-fonts/#from-packages
 
-# dart run global index_generator
+# dart pub global run index_generator
 index_generator:
   exclude:
     - '**.g.dart'

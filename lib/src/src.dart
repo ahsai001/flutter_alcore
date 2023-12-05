@@ -52,4 +52,5 @@ export 'extensions/color_manipulation.dart';
 export 'extensions/custom_extension.dart';
 export 'extensions/duration_extension.dart';
 export 'extensions/fl_chart_extension.dart';
+export 'extensions/scrollcontroller_extension.dart';
 export 'utils/widget_util.dart';
