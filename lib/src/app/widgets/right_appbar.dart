@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_alcore/src/app/widgets/app_history/app_history.dart';
 import 'package:flutter_alcore/src/utils/widget_util.dart';
-import 'package:get/get.dart';
 
 class RightAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -26,7 +25,7 @@ class RightAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: backExist
           ? IconButton(
               onPressed: () {
-                Get.back();
+                popBack(context);
               },
               icon: const Icon(Icons.arrow_back))
           : null,

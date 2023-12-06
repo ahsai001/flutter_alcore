@@ -183,11 +183,13 @@ void showAboutInfo(BuildContext context, String logoAssetPath,
         applicationName: packageInfo.appName,
         applicationVersion: packageInfo.version,
         children: [
-          ElevatedButton(
+          RoundedElevatedButton(
               onPressed: () {
-                Get.to(() => AppHistoryPage(
-                      getHistoryList: getHistoryList,
-                    ));
+                pushNewPage(
+                    context,
+                    (context) => AppHistoryPage(
+                          getHistoryList: getHistoryList,
+                        ));
               },
               child: const Text("Riwayat Aplikasi"))
         ]);
