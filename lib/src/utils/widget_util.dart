@@ -172,7 +172,8 @@ void showComingSoonInfo(BuildContext context, String feature) {
   showSnackBar(context, "$feature coming soon...");
 }
 
-void showAboutInfo(BuildContext context, String logoAssetPath) async {
+void showAboutInfo(BuildContext context, String logoAssetPath,
+    List<AppHistoryItem> Function() getHistoryList) async {
   final packageInfo = await PackageInfo.fromPlatform();
   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
     showCustomAboutDialog(
@@ -184,7 +185,9 @@ void showAboutInfo(BuildContext context, String logoAssetPath) async {
         children: [
           ElevatedButton(
               onPressed: () {
-                Get.to(() => const AppHistoryPage());
+                Get.to(() => AppHistoryPage(
+                      getHistoryList: getHistoryList,
+                    ));
               },
               child: const Text("Riwayat Aplikasi"))
         ]);

@@ -2,27 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_alcore/src/app/widgets/custom_light_theme_widget.dart';
 import 'package:flutter_alcore/src/app/widgets/right_appbar.dart';
 
+class AppHistoryItem {
+  final String version;
+  final List<String> changeLogs;
+  bool isExpanded = false;
+
+  AppHistoryItem(this.version, this.changeLogs);
+}
+
 class AppHistoryPage extends StatefulWidget {
-  const AppHistoryPage({Key? key}) : super(key: key);
+  final List<AppHistoryItem> Function() getHistoryList;
+  const AppHistoryPage({Key? key, required this.getHistoryList})
+      : super(key: key);
 
   @override
   State<AppHistoryPage> createState() => _AppHistoryPageState();
 }
 
 class _AppHistoryPageState extends State<AppHistoryPage> {
-  final List<Map<String, dynamic>> _items = [
-    {
-      "version": "1.0.0",
-      "changelog": ["versi awal"],
-      "isExpanded": true
-    }
-  ];
   @override
   Widget build(BuildContext context) {
     return CustomLightThemeWidget(
       child: Scaffold(
-        appBar: const RightAppBar(
+        appBar: RightAppBar(
           title: "Riwayat Aplikasi",
+          getHistoryList: widget.getHistoryList,
         ),
         body: SingleChildScrollView(
           child: ExpansionPanelList(
@@ -30,11 +34,12 @@ class _AppHistoryPageState extends State<AppHistoryPage> {
             // Controlling the expansion behavior
             expansionCallback: (index, isExpanded) {
               setState(() {
-                _items[index]['isExpanded'] = !isExpanded;
+                widget.getHistoryList()[index].isExpanded = isExpanded;
               });
             },
             animationDuration: const Duration(milliseconds: 600),
-            children: _items
+            children: widget
+                .getHistoryList()
                 .map(
                   (item) => ExpansionPanel(
                     canTapOnHeader: true,
@@ -42,7 +47,7 @@ class _AppHistoryPageState extends State<AppHistoryPage> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 15, horizontal: 30),
                         child: Text(
-                          item['version'],
+                          item.version,
                           style: const TextStyle(fontSize: 20),
                         )),
                     body: Container(
@@ -50,12 +55,11 @@ class _AppHistoryPageState extends State<AppHistoryPage> {
                           vertical: 15, horizontal: 30),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: (item['changelog'] as List<String>)
-                            .map((e) => Text("- $e"))
-                            .toList(),
+                        children:
+                            item.changeLogs.map((e) => Text("- $e")).toList(),
                       ),
                     ),
-                    isExpanded: item['isExpanded'],
+                    isExpanded: item.isExpanded,
                   ),
                 )
                 .toList(),

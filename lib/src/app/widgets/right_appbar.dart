@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_alcore/src/app/widgets/app_history/app_history.dart';
 import 'package:flutter_alcore/src/utils/widget_util.dart';
 import 'package:get/get.dart';
 
@@ -7,12 +8,14 @@ class RightAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool backExist;
   final PreferredSizeWidget? bottom;
   final String? logoAssetPath;
+  final List<AppHistoryItem> Function() getHistoryList;
   const RightAppBar(
       {Key? key,
       required this.title,
       this.backExist = true,
       this.bottom,
-      this.logoAssetPath})
+      this.logoAssetPath,
+      required this.getHistoryList})
       : super(key: key);
 
   @override
@@ -46,7 +49,7 @@ class RightAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (logoAssetPath != null)
             GestureDetector(
               onTap: () async {
-                showAboutInfo(context, logoAssetPath!);
+                showAboutInfo(context, logoAssetPath!, getHistoryList);
               },
               child: SizedBox(
                 height: kToolbarHeight - 20,

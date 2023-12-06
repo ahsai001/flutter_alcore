@@ -22,6 +22,7 @@ class TransparentAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+        forceMaterialTransparency: true,
         backgroundColor: Colors.transparent.withAlpha(alpha ?? 0),
         title: AppBarTitleText(
           title,
