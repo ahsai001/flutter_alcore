@@ -207,6 +207,12 @@ extension FileUploadDataMap on Map {
       if (value is FileUploadData) {
         value = await MultipartFile.fromFile(value.filePath,
             filename: value.fileName);
+      } else if (value is List<FileUploadData>) {
+        for (var j = 0; j < value.length; j++) {
+          final filePath = value[j];
+          value = <MultipartFile>[];
+          value.add(await MultipartFile.fromFile(filePath, filename: filePath));
+        }
       }
       //data[key] = value;
       data.putIfAbsent(key, () => value);
