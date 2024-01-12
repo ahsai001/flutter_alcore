@@ -208,11 +208,14 @@ extension FileUploadDataMap on Map {
         value = await MultipartFile.fromFile(value.filePath,
             filename: value.fileName);
       } else if (value is List<FileUploadData>) {
-        for (var j = 0; j < value.length; j++) {
-          final filePath = value[j];
-          value = <MultipartFile>[];
-          value.add(await MultipartFile.fromFile(filePath, filename: filePath));
+        int length = value.length;
+        final newListData = <MultipartFile>[];
+        for (var j = 0; j < length; j++) {
+          final FileUploadData fileData = value[j];
+          newListData.add(await MultipartFile.fromFile(fileData.filePath,
+              filename: fileData.fileName));
         }
+        value = newListData;
       }
       //data[key] = value;
       data.putIfAbsent(key, () => value);

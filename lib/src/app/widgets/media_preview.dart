@@ -14,7 +14,9 @@ class MediaPreviewController {
 
 class MediaPreviewWidget extends StatefulWidget {
   final MediaPreviewController mediaPreviewController;
-  const MediaPreviewWidget({super.key, required this.mediaPreviewController});
+  final Widget Function(BuildContext context)? emptyWidget;
+  const MediaPreviewWidget(
+      {super.key, required this.mediaPreviewController, this.emptyWidget});
 
   @override
   State<MediaPreviewWidget> createState() => _MediaPreviewWidgetState();
@@ -78,37 +80,46 @@ class _MediaPreviewWidgetState extends State<MediaPreviewWidget> {
             ),
           ],
         ),
-        GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, mainAxisSpacing: 10.0, crossAxisSpacing: 10.0),
-          itemBuilder: (context, index) {
-            return FileThumbnailWidget(
-              mediaInfo: widget.mediaPreviewController.list[index],
-              removeCallback: () {
-                setState(() {
-                  final file =
-                      File(widget.mediaPreviewController.list[index].file!);
-                  widget.mediaPreviewController.list.removeAt(index);
-                  file.deleteSync();
-                });
-              },
-              openCallback: () {
-                pushNewPageWithTransition(
-                    context,
-                    (context) => MediaGalleryPage(
-                          list: widget.mediaPreviewController.list,
-                          startIndex: index,
-                          imageProvider: (mediaInfo) {
-                            return FileImage(File(mediaInfo!.file!));
-                          },
-                        ));
-              },
-            );
-          },
-          itemCount: widget.mediaPreviewController.list.length,
-        ),
+        const SpaceHeight(),
+        if (widget.mediaPreviewController.list.isEmpty)
+          widget.emptyWidget != null
+              ? widget.emptyWidget!.call(context)
+              : const Text("No media attached")
+        else
+          GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0),
+            itemBuilder: (context, index) {
+              return FileThumbnailWidget(
+                mediaInfo: widget.mediaPreviewController.list[index],
+                removeCallback: () {
+                  setState(() {
+                    final file =
+                        File(widget.mediaPreviewController.list[index].file!);
+                    widget.mediaPreviewController.list.removeAt(index);
+                    file.deleteSync();
+                  });
+                },
+                openCallback: () {
+                  pushNewPageWithTransition(
+                      context,
+                      (context) => MediaGalleryPage(
+                            list: widget.mediaPreviewController.list,
+                            startIndex: index,
+                            imageProvider: (mediaInfo) {
+                              return FileImage(File(mediaInfo!.file!));
+                            },
+                          ));
+                },
+              );
+            },
+            itemCount: widget.mediaPreviewController.list.length,
+          ),
+        const SpaceHeight(),
       ],
     );
   }
