@@ -13,12 +13,12 @@ class ApiClient {
   Future<void> initialize() async {
     final packageInfo = await PackageInfo.fromPlatform();
     final options = BaseOptions(
-        connectTimeout: const Duration(milliseconds: 10000),
-        receiveTimeout: const Duration(milliseconds: 10000),
-        sendTimeout: const Duration(milliseconds: 10000),
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 15),
+        sendTimeout: const Duration(seconds: 15),
         headers: {
           'Accept': 'application/json; charset=UTF-8',
-          'X-KEYS': ApiEndPoint.apiKey,
+          'SYSHAB-KEYS': ApiEndPoint.apiKey,
           'x-platform': Platform.operatingSystem,
           'x-appname': packageInfo.appName,
           'x-packagename': packageInfo.packageName,
@@ -37,7 +37,8 @@ class ApiClient {
   String? newUrlForHandleRTO(DioException e, int attemptIndex, String lastUrl) {
     var isRTO = e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||
-        e.type == DioExceptionType.receiveTimeout;
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.connectionError;
 
     if (isRTO && attemptIndex < ApiEndPoint.baseAuthorityList.length - 1) {
       var lastBaseAuthority = ApiEndPoint.baseAuthority;
@@ -49,19 +50,23 @@ class ApiClient {
     return null;
   }
 
-  Future<String> get(String url,
-      {Map<String, dynamic>? queryParameters,
-      Map<String, dynamic>? headerParameters,
-      int attemptIndex = 0
-      // Options? options,
-      // CancelToken? cancelToken,
-      // ProgressCallback? onReceiveProgress,
-      }) async {
+  Future<String> get(
+    String url, {
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headerParameters,
+    int attemptIndex = 0,
+    Options? options,
+    // CancelToken? cancelToken,
+    // ProgressCallback? onReceiveProgress,
+  }) async {
     try {
+      options ??= Options();
+      options.headers = headerParameters;
+
       final Response response = await _dio.get(
         url,
         queryParameters: queryParameters,
-        options: Options(headers: headerParameters),
+        options: options,
         // cancelToken: cancelToken,
         // onReceiveProgress: onReceiveProgress,
       );
@@ -80,25 +85,31 @@ class ApiClient {
     }
   }
 
-  Future<String> post(String url,
-      {data,
-      Map<String, dynamic>? queryParameters,
-      Map<String, dynamic>? headerParameters,
-      int attemptIndex = 0
-      // Options? options,
-      // CancelToken? cancelToken,
-      // ProgressCallback? onSendProgress,
-      // ProgressCallback? onReceiveProgress,
-      }) async {
+  Future<String> post(
+    String url, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headerParameters,
+    int attemptIndex = 0,
+    Options? options,
+    // CancelToken? cancelToken,
+    // ProgressCallback? onSendProgress,
+    // ProgressCallback? onReceiveProgress,
+  }) async {
     try {
+      FormData? newData;
       if (data is Map) {
-        data = await data.convertAsFormData();
+        newData = await data.convertAsFormData();
       }
+
+      options ??= Options();
+      options.headers = headerParameters;
+
       final Response response = await _dio.post(
         url,
-        data: data,
+        data: newData,
         queryParameters: queryParameters,
-        options: Options(headers: headerParameters),
+        options: options,
         // cancelToken: cancelToken,
         // onSendProgress: onSendProgress,
         // onReceiveProgress: onReceiveProgress,
@@ -119,22 +130,26 @@ class ApiClient {
     }
   }
 
-  Future<String> put(String url,
-      {data,
-      Map<String, dynamic>? queryParameters,
-      Map<String, dynamic>? headerParameters,
-      int attemptIndex = 0
-      // Options? options,
-      // CancelToken? cancelToken,
-      // ProgressCallback? onSendProgress,
-      // ProgressCallback? onReceiveProgress,
-      }) async {
+  Future<String> put(
+    String url, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headerParameters,
+    int attemptIndex = 0,
+    Options? options,
+    // CancelToken? cancelToken,
+    // ProgressCallback? onSendProgress,
+    // ProgressCallback? onReceiveProgress,
+  }) async {
     try {
+      options ??= Options();
+      options.headers = headerParameters;
+
       final Response response = await _dio.put(
         url,
         data: data,
         queryParameters: queryParameters,
-        options: Options(headers: headerParameters),
+        options: options,
         // cancelToken: cancelToken,
         // onSendProgress: onSendProgress,
         // onReceiveProgress: onReceiveProgress,
@@ -155,22 +170,26 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> delete(String url,
-      {data,
-      Map<String, dynamic>? queryParameters,
-      Map<String, dynamic>? headerParameters,
-      int attemptIndex = 0
-      // Options? options,
-      // CancelToken? cancelToken,
-      // ProgressCallback? onSendProgress,
-      // ProgressCallback? onReceiveProgress,
-      }) async {
+  Future<dynamic> delete(
+    String url, {
+    data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headerParameters,
+    int attemptIndex = 0,
+    Options? options,
+    // CancelToken? cancelToken,
+    // ProgressCallback? onSendProgress,
+    // ProgressCallback? onReceiveProgress,
+  }) async {
     try {
+      options ??= Options();
+      options.headers = headerParameters;
+
       final Response response = await _dio.delete(
         url,
         data: data,
         queryParameters: queryParameters,
-        options: Options(headers: headerParameters),
+        options: options,
         // cancelToken: cancelToken,
       );
       return response.data;
@@ -201,6 +220,7 @@ extension FileUploadDataMap on Map {
   Future<FormData> convertAsFormData() async {
     Map<String, dynamic> data = {};
     var keyList = keys.toList();
+    //List<MapEntry<String, MultipartFile>> files = [];
     for (var i = 0; i < keyList.length; i++) {
       var key = keyList[i];
       var value = this[key];
@@ -209,17 +229,28 @@ extension FileUploadDataMap on Map {
             filename: value.fileName);
       } else if (value is List<FileUploadData>) {
         int length = value.length;
-        final newListData = <MultipartFile>[];
+        final fileList = <MultipartFile>[];
         for (var j = 0; j < length; j++) {
           final FileUploadData fileData = value[j];
-          newListData.add(await MultipartFile.fromFile(fileData.filePath,
+          fileList.add(await MultipartFile.fromFile(fileData.filePath,
               filename: fileData.fileName));
+
+          // files.add(MapEntry(
+          //   "$key",
+          //   MultipartFile.fromFileSync(fileData.filePath,
+          //       filename: fileData.fileName),
+          // ));
         }
-        value = newListData;
+        //continue;
+        value = fileList;
       }
-      //data[key] = value;
-      data.putIfAbsent(key, () => value);
+      data.putIfAbsent(key, () => value ?? "");
     }
-    return FormData.fromMap(data);
+    final formData = FormData.fromMap(data);
+
+    // if (files.isNotEmpty) {
+    //   formData.files.addAll(files);
+    // }
+    return formData;
   }
 }

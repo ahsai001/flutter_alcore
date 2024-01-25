@@ -17,24 +17,32 @@ class ApiExceptions implements Exception {
       case DioExceptionType.receiveTimeout:
         message = "Receive timeout in connection with API server";
         break;
+      case DioExceptionType.sendTimeout:
+        message = "Send timeout in connection with API server";
+        break;
       case DioExceptionType.badResponse:
         message = _handleError(
           dioError.response?.statusCode,
           dioError.response?.data,
         );
         break;
-      case DioExceptionType.sendTimeout:
-        message = "Send timeout in connection with API server";
-        break;
+      case DioExceptionType.connectionError:
       case DioExceptionType.unknown:
         if (dioError.message?.contains("SocketException") ?? false) {
           message = 'No Internet';
           break;
         }
-        message = "Unexpected error occurred";
+        message = _handleError(
+          dioError.response?.statusCode,
+          dioError.response?.data,
+        );
+        //message = "Unexpected error occurred";
         break;
       default:
-        message = "Something went wrong";
+        message = _handleError(
+          dioError.response?.statusCode,
+          dioError.response?.data,
+        );
         break;
     }
   }
