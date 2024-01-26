@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_alcore/src/app/widgets/custom_light_theme_widget.dart';
-import 'package:flutter_alcore/src/utils/widget_util.dart';
+import 'package:flutter_alcore/flutter_alcore.dart';
 import 'package:intl/intl.dart';
 
 class DateTextFieldController {
@@ -56,8 +55,9 @@ class DateTextFieldController {
 }
 
 class DateTextField extends StatelessWidget {
+  final String? label;
   final DateTextFieldController controller;
-  const DateTextField({super.key, required this.controller});
+  const DateTextField({super.key, required this.controller, this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +67,7 @@ class DateTextField extends StatelessWidget {
       onTap: () {
         _showDateRangeFilter(context);
       },
-      decoration: const InputDecoration(label: Text("Date")),
+      decoration: InputDecoration(label: Text(label ?? "Date")),
     );
   }
 
