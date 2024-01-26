@@ -28,6 +28,29 @@ class GalleryMedia {
           videoPlayerController: VideoPlayerController.file(File(file!)));
     }
   }
+
+  GalleryMedia copyWith({
+    String? id,
+    String? file,
+    String? thumbnail,
+  }) =>
+      GalleryMedia(
+        id: id ?? this.id,
+        file: file ?? this.file,
+        thumbnail: thumbnail ?? this.thumbnail,
+      );
+
+  factory GalleryMedia.fromJson(Map<String, dynamic> json) => GalleryMedia(
+        id: json["id"],
+        file: json["file"],
+        thumbnail: json["thumbnail"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "file": file,
+        "thumbnail": thumbnail,
+      };
 }
 
 class MediaGalleryPage extends StatefulWidget {
@@ -35,12 +58,15 @@ class MediaGalleryPage extends StatefulWidget {
   final int? startIndex;
   final List<GalleryMedia> list;
   final ImageProvider Function(GalleryMedia? file) imageProvider;
+  final VideoPlayerController Function(GalleryMedia? file)
+      videoPlayerController;
   const MediaGalleryPage(
       {super.key,
       this.title,
       this.startIndex = 0,
       required this.list,
-      required this.imageProvider});
+      required this.imageProvider,
+      required this.videoPlayerController});
 
   @override
   State<MediaGalleryPage> createState() => _MediaGalleryPageState();
@@ -86,8 +112,7 @@ class _MediaGalleryPageState extends State<MediaGalleryPage> {
           } else if (mediaInfo.mediaType == GalleryMediaType.video) {
             mediaInfo.flickManager ??= FlickManager(
                 autoPlay: false,
-                videoPlayerController:
-                    VideoPlayerController.file(File(mediaInfo.file!)));
+                videoPlayerController: widget.videoPlayerController(mediaInfo));
 
             return FlickVideoPlayer(
               flickManager: mediaInfo.flickManager!,

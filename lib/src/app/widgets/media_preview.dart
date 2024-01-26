@@ -6,6 +6,7 @@ import 'package:flutter_alcore/src/app/widgets/rounded_elevated_button.dart';
 import 'package:flutter_alcore/src/utils/widget_util.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:video_player/video_player.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class MediaPreviewController {
@@ -112,6 +113,10 @@ class _MediaPreviewWidgetState extends State<MediaPreviewWidget> {
                             startIndex: index,
                             imageProvider: (mediaInfo) {
                               return FileImage(File(mediaInfo!.file!));
+                            },
+                            videoPlayerController: (GalleryMedia? file) {
+                              return VideoPlayerController.file(
+                                  File(file!.file!));
                             },
                           ));
                 },
