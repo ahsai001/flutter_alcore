@@ -13,7 +13,6 @@ import 'package:flutter_alcore/src/app/widgets/custom_padding.dart';
 import 'package:flutter_alcore/src/app/widgets/rounded_elevated_button.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
@@ -489,22 +488,22 @@ Future<void> showStatefullWidgetsInDialog<I extends Object, O extends Object>(
   await showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 1.0);
-        const end = Offset.zero;
-        const curve = Curves.ease;
+      // transitionBuilder: (context, animation, secondaryAnimation, child) {
+      //   const begin = Offset(0.0, 1.0);
+      //   const end = Offset.zero;
+      //   const curve = Curves.ease;
 
-        final tween = Tween(begin: begin, end: end);
-        final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: curve,
-        );
+      //   final tween = Tween(begin: begin, end: end);
+      //   final curvedAnimation = CurvedAnimation(
+      //     parent: animation,
+      //     curve: curve,
+      //   );
 
-        return SlideTransition(
-          position: tween.animate(curvedAnimation),
-          child: child,
-        );
-      },
+      //   return SlideTransition(
+      //     position: tween.animate(curvedAnimation),
+      //     child: child,
+      //   );
+      // },
       pageBuilder: (BuildContext context, animIn, animOut) {
         I? request = getRequest?.call(context);
         return CustomLightThemeWidget(
