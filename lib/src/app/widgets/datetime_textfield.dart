@@ -50,6 +50,10 @@ class DateTimeTextFieldController {
     }
   }
 
+  DateTime? getDateTimeResult() {
+    return dateTime;
+  }
+
   String getDateTimeDisplayString() {
     return textEditingController!.text;
   }
@@ -58,7 +62,16 @@ class DateTimeTextFieldController {
 class DateTimeTextField extends StatelessWidget {
   final String? label;
   final DateTimeTextFieldController controller;
-  const DateTimeTextField({super.key, required this.controller, this.label});
+  final DateTime? firstDate;
+  final DateTime? lastDate;
+  final bool todayAsLastDate;
+  const DateTimeTextField(
+      {super.key,
+      required this.controller,
+      this.label,
+      this.firstDate,
+      this.lastDate,
+      this.todayAsLastDate = true});
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +91,14 @@ class DateTimeTextField extends StatelessWidget {
       context: context,
       initialDate: controller.dateTime == null ? today : controller.dateTime!,
       initialEntryMode: DatePickerEntryMode.calendarOnly,
-      firstDate: DateTime(today.year - globalYearPeriodSelection, 1,
-          1), // the earliest allowable
-      lastDate: today, // the latest allowable
+      firstDate: firstDate ??
+          DateTime(today.year - globalYearPeriodSelection, 1,
+              1), // the earliest allowable
+      lastDate: lastDate ??
+          (todayAsLastDate
+              ? today
+              : DateTime(today.year + globalYearPeriodSelection, 12,
+                  31)), // the latest allowable
       currentDate: today,
       builder: (context, child) {
         return CustomLightThemeWidget(child: child!);
