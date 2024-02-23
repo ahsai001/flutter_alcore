@@ -37,8 +37,7 @@ class ApiClient {
   String? newUrlForHandleRTO(DioException e, int attemptIndex, String lastUrl) {
     var isRTO = e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||
-        e.type == DioExceptionType.receiveTimeout ||
-        e.type == DioExceptionType.connectionError;
+        e.type == DioExceptionType.receiveTimeout;
 
     if (isRTO && attemptIndex < ApiEndPoint.baseAuthorityList.length - 1) {
       var lastBaseAuthority = ApiEndPoint.baseAuthority;
@@ -78,7 +77,7 @@ class ApiClient {
         return get(newUrl,
             queryParameters: queryParameters,
             headerParameters: headerParameters,
-            attemptIndex: attemptIndex++);
+            attemptIndex: attemptIndex + 1);
       } else {
         throw errorMessage;
       }
@@ -123,7 +122,7 @@ class ApiClient {
             data: data,
             queryParameters: queryParameters,
             headerParameters: headerParameters,
-            attemptIndex: attemptIndex++);
+            attemptIndex: attemptIndex + 1);
       } else {
         throw errorMessage;
       }
@@ -163,7 +162,7 @@ class ApiClient {
             data: data,
             queryParameters: queryParameters,
             headerParameters: headerParameters,
-            attemptIndex: attemptIndex++);
+            attemptIndex: attemptIndex + 1);
       } else {
         throw errorMessage;
       }
@@ -201,7 +200,7 @@ class ApiClient {
             data: data,
             queryParameters: queryParameters,
             headerParameters: headerParameters,
-            attemptIndex: attemptIndex++);
+            attemptIndex: attemptIndex + 1);
       } else {
         throw errorMessage;
       }
