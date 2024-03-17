@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +19,7 @@ class ApiClient {
         sendTimeout: const Duration(seconds: 15),
         headers: {
           'Accept': 'application/json; charset=UTF-8',
-          'SYSHAB-KEYS': ApiEndPoint.apiKey,
+          'APIKEY': ApiEndPoint.apiKey,
           'x-platform': Platform.operatingSystem,
           'x-appname': packageInfo.appName,
           'x-packagename': packageInfo.packageName,
@@ -69,7 +70,8 @@ class ApiClient {
         // cancelToken: cancelToken,
         // onReceiveProgress: onReceiveProgress,
       );
-      return response.toString();
+      //return response.toString();
+       return jsonEncode(response.data);
     } on DioException catch (e) {
       final errorMessage = ApiExceptions.fromDioError(e).message;
       var newUrl = newUrlForHandleRTO(e, attemptIndex, url);
@@ -113,7 +115,7 @@ class ApiClient {
         // onSendProgress: onSendProgress,
         // onReceiveProgress: onReceiveProgress,
       );
-      return response.toString();
+      return jsonEncode(response.data);
     } on DioException catch (e) {
       final errorMessage = ApiExceptions.fromDioError(e).message;
       var newUrl = newUrlForHandleRTO(e, attemptIndex, url);
@@ -153,7 +155,7 @@ class ApiClient {
         // onSendProgress: onSendProgress,
         // onReceiveProgress: onReceiveProgress,
       );
-      return response.toString();
+      return jsonEncode(response.data);
     } on DioException catch (e) {
       final errorMessage = ApiExceptions.fromDioError(e).message;
       var newUrl = newUrlForHandleRTO(e, attemptIndex, url);
@@ -169,7 +171,7 @@ class ApiClient {
     }
   }
 
-  Future<dynamic> delete(
+  Future<String> delete(
     String url, {
     data,
     Map<String, dynamic>? queryParameters,
@@ -191,7 +193,8 @@ class ApiClient {
         options: options,
         // cancelToken: cancelToken,
       );
-      return response.data;
+      //return response.data;
+      return jsonEncode(response.data);
     } on DioException catch (e) {
       final errorMessage = ApiExceptions.fromDioError(e).message;
       var newUrl = newUrlForHandleRTO(e, attemptIndex, url);
