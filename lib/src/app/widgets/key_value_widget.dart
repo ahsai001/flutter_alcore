@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class KeyValueWidget extends StatelessWidget {
-  final String keyLabel;
-  final String valueLabel;
+  final String keyText;
+  final String valueText;
+  final double width;
+  final bool valueIsHtml;
   final String? url;
-  const KeyValueWidget(
-      {Key? key, required this.keyLabel, required this.valueLabel, this.url})
-      : super(key: key);
+  const KeyValueWidget(this.keyText, this.valueText,
+      {super.key, this.width = 70, this.valueIsHtml = false, this.url});
 
   @override
   Widget build(BuildContext context) {
@@ -15,15 +17,17 @@ class KeyValueWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         SizedBox(
-          width: 120,
-          child: Text(keyLabel),
+          width: width,
+          child: Text(keyText),
         ),
         const Text(" : "),
         Expanded(
-          child: Text(
-            valueLabel,
-            overflow: TextOverflow.visible,
-          ),
+          child: valueIsHtml
+              ? Html(data: valueText)
+              : Text(
+                  valueText,
+                  overflow: TextOverflow.visible,
+                ),
         ),
         if (url != null && url!.isNotEmpty)
           IconButton(
