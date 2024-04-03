@@ -39,6 +39,7 @@ export 'app/widgets/rounded_elevated_button.dart';
 export 'app/widgets/rounded_textfield.dart';
 export 'app/widgets/scan/scan_page.dart';
 export 'app/widgets/scan/scanner_error_widget.dart';
+export 'app/widgets/searchable_appbar.dart';
 export 'app/widgets/slider_banner.dart';
 export 'app/widgets/theme_resources.dart';
 export 'app/widgets/transparent_appbar.dart';
