@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -71,7 +71,7 @@ class ApiClient {
         // onReceiveProgress: onReceiveProgress,
       );
       //return response.toString();
-       return jsonEncode(response.data);
+      return jsonEncode(response.data);
     } on DioException catch (e) {
       final errorMessage = ApiExceptions.fromDioError(e).message;
       var newUrl = newUrlForHandleRTO(e, attemptIndex, url);
@@ -108,7 +108,7 @@ class ApiClient {
 
       final Response response = await _dio.post(
         url,
-        data: newData,
+        data: newData ?? data,
         queryParameters: queryParameters,
         options: options,
         // cancelToken: cancelToken,
@@ -143,12 +143,17 @@ class ApiClient {
     // ProgressCallback? onReceiveProgress,
   }) async {
     try {
+      FormData? newData;
+      if (data is Map) {
+        newData = await data.convertAsFormData();
+      }
+
       options ??= Options();
       options.headers = headerParameters;
 
       final Response response = await _dio.put(
         url,
-        data: data,
+        data: newData ?? data,
         queryParameters: queryParameters,
         options: options,
         // cancelToken: cancelToken,
@@ -183,12 +188,17 @@ class ApiClient {
     // ProgressCallback? onReceiveProgress,
   }) async {
     try {
+      FormData? newData;
+      if (data is Map) {
+        newData = await data.convertAsFormData();
+      }
+
       options ??= Options();
       options.headers = headerParameters;
 
       final Response response = await _dio.delete(
         url,
-        data: data,
+        data: newData ?? data,
         queryParameters: queryParameters,
         options: options,
         // cancelToken: cancelToken,
