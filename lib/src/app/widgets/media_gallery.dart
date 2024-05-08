@@ -1,11 +1,41 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 enum GalleryMediaType { image, video }
+
+bool linkIsVideo(String? link) {
+  if (link?.endsWith(".mp4") ?? false) {
+    return true;
+  }
+
+  return false;
+}
+
+Future<String?> getMediaThumbnail(String media) async {
+  final folder = (await getTemporaryDirectory()).path;
+  return await VideoThumbnail.thumbnailFile(
+    video: media,
+    thumbnailPath: folder,
+    imageFormat: ImageFormat.WEBP,
+    quality: 100,
+  );
+}
+
+Future<GalleryMedia> getGalleryMedia(String link) async {
+  if (linkIsVideo(link)) {
+    final thumbnail = await getMediaThumbnail(link);
+    return GalleryMedia(file: link, thumbnail: thumbnail);
+  } else {
+    return GalleryMedia(file: link, thumbnail: link);
+  }
+}
 
 class GalleryMedia {
   String? id;
@@ -17,16 +47,43 @@ class GalleryMedia {
     id ??= file;
     if (mediaType == null) {
       mediaType = GalleryMediaType.image;
-      if (file?.endsWith(".mp4") ?? false) {
+      if (linkIsVideo(file)) {
         mediaType = GalleryMediaType.video;
       }
     }
+  }
 
-    if (mediaType == GalleryMediaType.video) {
-      flickManager = FlickManager(
-          autoPlay: false,
-          videoPlayerController: VideoPlayerController.file(File(file!)));
+  ImageProvider? getThumbnailImageProvider() {
+    if (thumbnail?.startsWith("http://") ?? false) {
+      return CachedNetworkImageProvider(thumbnail!);
+    } else if (thumbnail?.startsWith("https://") ?? false) {
+      return CachedNetworkImageProvider(thumbnail!);
+    } else {
+      return FileImage(File(thumbnail!));
     }
+  }
+
+  Widget? getThumbnailImage() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        if (thumbnail?.startsWith("http://") ?? false)
+          CachedNetworkImage(
+            imageUrl: thumbnail!,
+          )
+        else if (thumbnail?.startsWith("https://") ?? false)
+          CachedNetworkImage(
+            imageUrl: thumbnail!,
+          )
+        else
+          Image.file(File(thumbnail!)),
+        if (linkIsVideo(file))
+          const Icon(
+            Icons.play_arrow,
+            color: Colors.white,
+          ),
+      ],
+    );
   }
 
   GalleryMedia copyWith({

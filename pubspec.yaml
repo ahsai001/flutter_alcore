@@ -44,6 +44,7 @@ dependencies:
   video_thumbnail: ^0.5.3
   video_player: ^2.8.2
   flick_video_player: ^0.7.0
+  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:

@@ -5,9 +5,7 @@ import 'package:flutter_alcore/src/app/widgets/media_gallery.dart';
 import 'package:flutter_alcore/src/app/widgets/rounded_elevated_button.dart';
 import 'package:flutter_alcore/src/utils/widget_util.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class MediaPreviewController {
   List<GalleryMedia> list = [];
@@ -40,13 +38,7 @@ class _MediaPreviewWidgetState extends State<MediaPreviewWidget> {
   Future<bool> takeVideo() async {
     final XFile? video = await picker.pickVideo(source: ImageSource.camera);
     if (video != null) {
-      final folder = (await getTemporaryDirectory()).path;
-      final thumbnail = await VideoThumbnail.thumbnailFile(
-        video: video.path,
-        thumbnailPath: folder,
-        imageFormat: ImageFormat.WEBP,
-        quality: 100,
-      );
+      final thumbnail = await getMediaThumbnail(video.path);
       widget.mediaPreviewController.list
           .add(GalleryMedia(file: video.path, thumbnail: thumbnail));
       return true;
@@ -153,7 +145,7 @@ class FileThumbnailWidget extends StatelessWidget {
             File(mediaInfo.thumbnail!),
             fit: BoxFit.fitWidth,
           ),
-          if (mediaInfo.file!.endsWith(".mp4"))
+          if (linkIsVideo(mediaInfo.file))
             const Icon(
               Icons.play_arrow,
               color: Colors.white,
