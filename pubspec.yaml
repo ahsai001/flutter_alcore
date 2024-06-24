@@ -43,7 +43,7 @@ dependencies:
   
   video_thumbnail: ^0.5.3
   video_player: ^2.8.2
-  flick_video_player: ^0.7.0
+  flick_video_player: ^0.8.0
   cached_network_image: ^3.3.1
 
 dev_dependencies:
@@ -54,7 +54,7 @@ dev_dependencies:
   drift_dev: ^2.13.2
   envied_generator: ^0.5.1
 dependency_overrides: 
-  win32: 5.1.0
+  #win32: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
