@@ -54,7 +54,7 @@ dev_dependencies:
   drift_dev: ^2.13.2
   envied_generator: ^0.5.1
 dependency_overrides: 
-  win32: any
+  win32: 5.1.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
