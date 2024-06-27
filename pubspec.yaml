@@ -30,7 +30,7 @@ dependencies:
   loadmore: ^2.1.0
   location: ^5.0.3
   logger: ^2.0.2+1
-  mobile_scanner: ^3.5.2
+  mobile_scanner: ^5.1.1
   package_info_plus: ^8.0.0
   path: ^1.8.3
   path_provider: ^2.1.1

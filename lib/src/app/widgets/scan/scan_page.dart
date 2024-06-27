@@ -16,6 +16,7 @@ class ScannerPage extends StatefulWidget {
   final String? messageWhenProcessingResult;
   final Widget? loadingWidgetWhenProcessingResult;
   final List<Widget>? customVerticalWidgets;
+  final String? assetImage;
   const ScannerPage(
       {Key? key,
       this.title,
@@ -25,7 +26,8 @@ class ScannerPage extends StatefulWidget {
       this.manualScan = false,
       this.messageWhenProcessingResult,
       this.loadingWidgetWhenProcessingResult,
-      this.customVerticalWidgets})
+      this.customVerticalWidgets,
+      this.assetImage})
       : super(key: key);
 
   @override
@@ -73,8 +75,6 @@ class _ScannerPageState extends State<ScannerPage> {
     }
   }
 
-  MobileScannerArguments? arguments;
-
   @override
   void initState() {
     super.initState();
@@ -107,12 +107,6 @@ class _ScannerPageState extends State<ScannerPage> {
                   fit: BoxFit.contain,
                   scanWindow: scanWindow,
                   controller: widget.controller,
-                  onScannerStarted: (arguments) {
-                    setState(() {
-                      //debugPrint("ahmad : scanner started");
-                      this.arguments = arguments;
-                    });
-                  },
                   errorBuilder: (context, exception, widget) {
                     return ScannerErrorWidget(error: exception);
                   },
@@ -120,23 +114,22 @@ class _ScannerPageState extends State<ScannerPage> {
                     return Container(
                       color: Colors.transparent,
                       alignment: Alignment.center,
-                      child: Image.asset(
-                        "assets/images/app_icon.png",
-                        width: scanWindow.width,
-                        height: scanWindow.height,
-                      ),
+                      child: this.widget.assetImage != null
+                          ? Image.asset(
+                              this.widget.assetImage!,
+                              width: scanWindow.width,
+                              height: scanWindow.height,
+                            )
+                          : null,
                     );
                   }),
                   onDetect: onDetect,
                 ),
               ),
-              if (barcode != null &&
-                  barcode?.corners != null &&
-                  arguments != null)
+              if (barcode != null && barcode?.corners != null)
                 CustomPaint(
                   painter: BarcodeOverlay(
                     barcode: barcode!,
-                    arguments: arguments!,
                     boxFit: BoxFit.contain,
                     capture: capture!,
                   ),
@@ -314,20 +307,18 @@ class ScannerOverlay extends CustomPainter {
 class BarcodeOverlay extends CustomPainter {
   BarcodeOverlay({
     required this.barcode,
-    required this.arguments,
     required this.boxFit,
     required this.capture,
   });
 
   final BarcodeCapture capture;
   final Barcode barcode;
-  final MobileScannerArguments arguments;
   final BoxFit boxFit;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (barcode.corners == null) return;
-    final adjustedSize = applyBoxFit(boxFit, arguments.size, size);
+    final adjustedSize = applyBoxFit(boxFit, capture.size, size);
 
     double verticalPadding = size.height - adjustedSize.destination.height;
     double horizontalPadding = size.width - adjustedSize.destination.width;
@@ -343,12 +334,9 @@ class BarcodeOverlay extends CustomPainter {
       horizontalPadding = 0;
     }
 
-    final ratioWidth =
-        (Platform.isIOS ? capture.width! : arguments.size.width) /
-            adjustedSize.destination.width;
+    final ratioWidth = (capture.size.width!) / adjustedSize.destination.width;
     final ratioHeight =
-        (Platform.isIOS ? capture.height! : arguments.size.height) /
-            adjustedSize.destination.height;
+        (capture.size.height!) / adjustedSize.destination.height;
 
     final List<Offset> adjustedOffset = [];
     for (final offset in barcode.corners!) {
