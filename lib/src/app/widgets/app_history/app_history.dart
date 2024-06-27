@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_alcore/src/app/widgets/appbar_title_text.dart';
 import 'package:flutter_alcore/src/app/widgets/custom_light_theme_widget.dart';
-import 'package:flutter_alcore/src/app/widgets/right_appbar.dart';
 
 class AppHistoryItem {
   final String version;
@@ -20,13 +20,19 @@ class AppHistoryPage extends StatefulWidget {
 }
 
 class _AppHistoryPageState extends State<AppHistoryPage> {
+  List<AppHistoryItem> historyList = [];
+  @override
+  void initState() {
+    historyList = widget.getHistoryList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomLightThemeWidget(
       child: Scaffold(
-        appBar: RightAppBar(
-          title: "Riwayat Aplikasi",
-          getHistoryList: widget.getHistoryList,
+        appBar: AppBar(
+          title: const AppBarTitleText("Riwayat Aplikasi"),
         ),
         body: SingleChildScrollView(
           child: ExpansionPanelList(
@@ -34,12 +40,11 @@ class _AppHistoryPageState extends State<AppHistoryPage> {
             // Controlling the expansion behavior
             expansionCallback: (index, isExpanded) {
               setState(() {
-                widget.getHistoryList()[index].isExpanded = isExpanded;
+                historyList[index].isExpanded = isExpanded;
               });
             },
             animationDuration: const Duration(milliseconds: 600),
-            children: widget
-                .getHistoryList()
+            children: historyList
                 .map(
                   (item) => ExpansionPanel(
                     canTapOnHeader: true,
