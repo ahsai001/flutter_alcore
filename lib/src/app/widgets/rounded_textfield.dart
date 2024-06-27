@@ -13,6 +13,9 @@ class RoundedTextField extends StatefulWidget {
   final bool autoFocus;
   final TextInputType? textInputType;
   final TextInputAction? textInputAction;
+  final Widget? icon;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
 
   const RoundedTextField(
       {super.key,
@@ -26,7 +29,10 @@ class RoundedTextField extends StatefulWidget {
       this.isReadOnly = false,
       this.autoFocus = false,
       this.textInputType,
-      this.textInputAction});
+      this.textInputAction,
+      this.icon,
+      this.prefixIcon,
+      this.suffixIcon});
 
   @override
   State<RoundedTextField> createState() => _RoundedTextFieldState();
@@ -64,15 +70,25 @@ class _RoundedTextFieldState extends State<RoundedTextField> {
             fillColor: widget.backgroundColor, // Set the background color
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            suffixIcon: widget.isPassword
-                ? IconButton(
-                    onPressed: () {
-                      setState(() {
-                        obscureText = !obscureText;
-                      });
-                    },
-                    icon: Icon(
-                        obscureText ? Icons.visibility_off : Icons.visibility))
+            icon: widget.icon,
+            prefixIcon: widget.prefixIcon,
+            suffixIcon: widget.suffixIcon != null || widget.isPassword
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.suffixIcon != null) widget.suffixIcon!,
+                      if (widget.isPassword)
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                obscureText = !obscureText;
+                              });
+                            },
+                            icon: Icon(obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility))
+                    ],
+                  )
                 : null));
   }
 }
